@@ -163,37 +163,37 @@ router.put("/:id", (req, res) => {
     if(posts.length === 0){
       res.status(404).json({message: "The post with the specified ID does not exist."});
       return;
+    } else {
+      if (
+        !req.body.title ||
+        !req.body.title.trim() ||
+        !req.body.contents ||
+        !req.body.contents.trim()
+      ) {
+        res
+          .status(400)
+          .json({
+            message: "Please provide 'title' and 'contents' fields to create post."
+          });
+      } else {
+        const post = {
+          title: req.body.title,
+          contents: req.body.contents
+        }
+        database.update(req.params.id, post)
+        .then(val => {
+          res.status(200).json(post);
+        })
+        .catch(err => {
+          res.status(500).json({message: "The post information could not be modified."});
+        })
+      }
     }
   })
   .catch(err => {
     res.status(500).json({message: "An error occurred while trying to find the specified post."});
     return;
   })
-
-  if (
-    !req.body.title ||
-    !req.body.title.trim() ||
-    !req.body.contents ||
-    !req.body.contents.trim()
-  ) {
-    res
-      .status(400)
-      .json({
-        message: "Please provide 'title' and 'contents' fields to create post."
-      });
-  } else {
-    const post = {
-      title: req.body.title,
-      contents: req.body.contents
-    }
-    database.update(req.params.id, post)
-    .then(val => {
-      res.status(200).json(post);
-    })
-    .catch(err => {
-      res.status(500).json({message: "The post information could not be modified."});
-    })
-  }
 });
 
 module.exports = router;
