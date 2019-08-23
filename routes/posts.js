@@ -134,27 +134,25 @@ router.get("/:id/comments", (req, res) => {
 
 router.delete("/:id", (req, res) => {
   // Removes the post with the specified id and returns the deleted post object. You may need to make additional calls to the database in order to satisfy this requirement.
-  const targetPost = {};
   database.findById(req.params.id)
   .then(posts => {
     if(posts.length === 0){
       res.status(404).json({message: "The post with the specified ID does not exist"});
       return;
     } else {
-      targetPost = posts[0];
+      const targetPost = posts[0];
+      database.remove(req.params.id)
+      .then(val => {
+        res.status(200).json(targetPost);
+      })
+      .catch(err => {
+        res.status(500).json({message: "An error occurred while trying to delete the specified post."});
+      })
     }
   })
   .catch(err => {
     res.status(500).json({message: `There was an error finding the post with id ${req.params.id}`});
     return;
-  })
-
-  database.remove(req.params.id)
-  .then(val => {
-    res.status(200).json(targetPost);
-  })
-  .catch(err => {
-    res.status(500).json({message: "An error occurred while trying to delete the specified post."});
   })
 });
 
